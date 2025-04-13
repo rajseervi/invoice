@@ -1,0 +1,9 @@
+{
+  "projects": {
+    "default": "ambient-courage-229205"
+  },
+  "hosting": {
+    "port": 5000,
+    "host": "0.0.0.0"
+  }
+}
