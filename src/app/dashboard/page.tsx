@@ -154,21 +154,32 @@ export default function Dashboard() {
             }
           });
           
-          // Check if the response is JSON
-          const contentType = authResponse.headers.get('content-type');
-          if (contentType && contentType.includes('application/json')) {
-            const authData = await authResponse.json();
-            
+          // Use the utility function to safely parse JSON
+          const authData = await safelyParseJson(authResponse, 'Auth verification error:');
+          
+          if (authData) {
             if (!authData.authenticated) {
               console.error('User is not authenticated');
-              window.location.href = '/login?callbackUrl=' + encodeURIComponent('/dashboard');
-              return;
+              // Only redirect if we're not already on the login page
+    Use the utility function to safely parse JSON
+          const authData = await safelyParseJson(authResponse, 'Auth verification error:');
+          
+          if (authData) {
+            if (!authData.authenticated) {
+              console.error('User is not authenticatedfailed JSON parsing
+r('Failed to parse authentication response');
+              // Only redirect if we're not already on the login page
+              if (!window.location.pathname.includes('/login')) {
+            if (!window.location.pathname.includes('/login')) {
+                window.location.href = '/login?callbackUrl=' + encodeURIComponent('/dashboard');
+                  return;
+              }
+              }
             }
           } else {
-            // Handle non-JSON response (likely HTML error page)
-            console.error('Received non-JSON response from auth verify endpoint');
+            // Handle failed JSON parsing
+            console.error('Failed to parse authentication response');
             console.error('Status:', authResponse.status, authResponse.statusText);
-            console.error('Content-Type:', contentType);
             
             // For development purposes, continue without redirecting
             console.warn('Development mode: Continuing without authentication');
@@ -176,33 +187,33 @@ export default function Dashboard() {
         } catch (authError) {
           console.error('Error during authentication verification:', authError);
           // For development purposes, continue without redirecting
-          console.warn('Development mode: Continuing without authentication');
+    // Use the utility function to safely parse JSON
+          const companyData = await safelyParseJson(companyResponse, 'Company info error:');
+        
+        if (companyData) {
+      console.warn('Development mode: Continuing without authentication');
         }
         
-        // Fetch company information
+      // Fetch company information
         try {
-          const companyResponse = await fetch('/api/company', {
-            headers: {
-              'Accept': 'application/json',
+          conawait fetch('/api/company', {
+            headers:             'Accept': 'application/json',
               'Cache-Control': 'no-cache, no-store'
             }
           });
           
-          if (companyResponse.ok) {
-            try {
-              const companyData = await companyResponse.json();
-              if (companyData.success && companyData.data) {
-                setCompanyInfo(companyData.data);
-              } else if (companyData.fallbackData) {
-                // Use fallback data if available
-                setCompanyInfo(companyData.fallbackData);
-              }
-            } catch (jsonError) {
-              console.error('Error parsing company info JSON:', jsonError);
-              // Continue with default company info
+          // Use the utility function to safely parse JSON
+          const companyData = await safelyParseJsony info error:');
+          
+          if (companyData) {
+            if (companyData.success && companyData.data) {
+              setCompanyInfo(companyData.data);
+            } else if (companyData.fallbackData) {
+              // Use fallback data if available
+              setCompanyInfo(companyData.fallbackData);
             }
           } else {
-            console.warn(`Failed to fetch company info: ${companyResponse.status} ${companyResponse.statusText}`);
+            console.warn('Failed to parse company info response');
             // Continue with default company info
           }
         } catch (companyErr) {

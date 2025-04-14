@@ -1,5 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { safelyParseJson } from '@/utils/apiHelpers';
+import { safelyParseJson } from '@/utils/apiHelpers';
 import { 
   Box, 
   Card, 
@@ -64,18 +66,12 @@ export default function CompanyInfoForm() {
           }
         });
         
-        if (!response.ok) {
-          console.warn(`Failed to fetch company info: ${response.status} ${response.statusText}`);
+        // Use the utility function to safely parse JSON
+        const result = await safelyParseJson(response, 'Company info fetch error:');
+        
+        if (!result) {
           throw new Error(`Failed to fetch company information (${response.status})`);
         }
-        
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          console.error('Received non-JSON response from company API');
-          throw new Error('Received invalid response format from server');
-        }
-        
-        const result = await response.json();
         
         if (result.success && result.data) {
           // Convert string dates to Date objects
@@ -83,7 +79,12 @@ export default function CompanyInfoForm() {
           if (data.plan && data.plan.expiryDate) {
             data.plan.expiryDate = new Date(data.plan.expiryDate);
           }
-          
+          // Use the utility function to safely parse JSON
+        const result = await safelyParseJson(response, 'Company info fetch error:');
+        
+        if (!result) {
+          throw new Error(`Failed to fetch company information (${response.status})`);
+        }
           setCompanyInfo(data);
         }
       } catch (err) {
@@ -170,7 +171,12 @@ export default function CompanyInfoForm() {
     try {
       setSaving(true);
       setError(null);
+    // Use the utility function to safely parse JSON
+      const result = await safelyParseJson(response, 'Company info save error:');
       
+      if (!result) {
+        throw new Error(`Failed to save company information (${response.status})`  
+      }
       const response = await fetch('/api/company', {
         method: 'POST',
         headers: {
@@ -181,15 +187,14 @@ export default function CompanyInfoForm() {
         body: JSON.stringify(companyInfo),
       });
       
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        console.error('Received non-JSON response from company API during save');
-        throw new Error('Received invalid response format from server');
+      // Use the utility function to safely parse JSON
+      const result = await safelyParseJson(response, 'Company info save error:');
+      
+      if (!result) {
+        throw new Error(`Failed to save company information (${response.status})`);
       }
       
-      const result = await response.json();
-      
-      if (!response.ok || !result.success) {
+      if (!result.success) {
         // If we have original data in the error response, we can recover
         if (result.originalData) {
           console.warn('Using original data from error response');

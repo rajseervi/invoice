@@ -10,7 +10,19 @@ export async function GET(request: NextRequest) {
     if (!sessionCookie) {
       return NextResponse.json(
         { authenticated: false, message: 'No session cookie found' },
-        { status: 401 }
+        { 
+          
+          status: 401,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store, max-age=0'
+          }
+       ,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store, max-age=0'
+          }
+        }
       );
     }
 
@@ -20,12 +32,34 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       authenticated: true,
       role: userRole || 'user'
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, max-age=0'
+      }
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, max-age=0'
+      }
     });
   } catch (error) {
     console.error('Error verifying session:', error);
     return NextResponse.json(
       { authenticated: false, message: 'Failed to verify session' },
-      { status: 500 }
+      { 
+        
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, max-age=0'
+        }
+     ,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, max-age=0'
+        }
+      }
     );
   }
 }

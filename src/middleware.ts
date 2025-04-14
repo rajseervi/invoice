@@ -11,7 +11,11 @@ export async function middleware(request: NextRequest) {
                       path === '/register' || 
                       path === '/forgot-password' || 
                       path === '/reset-password' || 
-                      path.startsWith('/api/auth/');
+                      path.startsWith('/api/auth/') ||
+                      path.startsWith('/_next/') ||
+                      path === '/favicon.ico' ||
+                      path.startsWith('/_next/') ||
+                      path === '/favicon.ico';
   
   // Define admin paths that require admin role
   const isAdminPath = path.startsWith('/admin');
@@ -25,6 +29,26 @@ export async function middleware(request: NextRequest) {
   
   // If the path requires authentication and the user is not authenticated, redirect to login
   if (!isPublicPath && !session) {
+    // Prevent redirect loops by checking if we're already redirecting to login
+    const referer = request.headers.get('referer') || '';
+    const isFromLogin = referer.includes('/login');
+    
+    // If we're coming from login, don't redirect again to prevent loops
+    if (isFromLogin) {
+      console.log('Preventing redirect loop from login page');
+      return NextResponse.next();
+    }
+    
+    // Prevent redirect loops by checking if we're already redirecting to login
+    const referer = request.headers.get('referer') || '';
+    const isFromLogin = referer.includes('/login');
+    
+    // If we're coming from login, don't redirect again to prevent loops
+    if (isFromLogin) {
+      console.log('Preventing redirect loop from login page');
+      return NextResponse.next();
+    }
+    
     const loginUrl = new URL('/login', request.url);
     // Add the original URL as a query parameter to redirect after login
     if (path !== '/') {

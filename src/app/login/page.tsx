@@ -186,7 +186,13 @@ export default function Login() {
         await setPersistence(auth, browserSessionPersistence);
       }
       
+      // Get the loginWithGoogle function from the same useAuth instance
+      // Get the loginWithGoogle function from the same useAuth instance
       const { loginWithGoogle } = useAuth();
+      
+      // Call the function
+      
+      // Call the function
       await loginWithGoogle();
       
       // Show success message
