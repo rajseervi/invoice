@@ -57,10 +57,22 @@ export default function CompanyInfoForm() {
     const fetchCompanyInfo = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/company');
+        const response = await fetch('/api/company', {
+          headers: {
+            'Accept': 'application/json',
+            'Cache-Control': 'no-cache, no-store'
+          }
+        });
         
         if (!response.ok) {
-          throw new Error('Failed to fetch company information');
+          console.warn(`Failed to fetch company info: ${response.status} ${response.statusText}`);
+          throw new Error(`Failed to fetch company information (${response.status})`);
+        }
+        
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          console.error('Received non-JSON response from company API');
+          throw new Error('Received invalid response format from server');
         }
         
         const result = await response.json();
@@ -163,13 +175,25 @@ export default function CompanyInfoForm() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache, no-store'
         },
         body: JSON.stringify(companyInfo),
       });
       
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('Received non-JSON response from company API during save');
+        throw new Error('Received invalid response format from server');
+      }
+      
       const result = await response.json();
       
       if (!response.ok || !result.success) {
+        // If we have original data in the error response, we can recover
+        if (result.originalData) {
+          console.warn('Using original data from error response');
+        }
         throw new Error(result.error || 'Failed to save company information');
       }
       

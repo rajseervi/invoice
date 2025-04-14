@@ -119,15 +119,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const fetchCompanyInfo = async () => {
       try {
         setLoadingCompany(true);
-        const response = await fetch('/api/company');
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success && data.data) {
-            setCompanyInfo(data.data);
+        const response = await fetch('/api/company', {
+          headers: {
+            'Accept': 'application/json',
+            'Cache-Control': 'no-cache, no-store'
           }
+        });
+        
+        if (response.ok) {
+          try {
+            const data = await response.json();
+            if (data.success && data.data) {
+              setCompanyInfo(data.data);
+            }
+          } catch (jsonError) {
+            console.error('Error parsing company info JSON:', jsonError);
+            // Continue with default company info
+          }
+        } else {
+          console.warn(`Failed to fetch company info: ${response.status} ${response.statusText}`);
+          // Continue with default company info
         }
       } catch (error) {
         console.error('Error fetching company info:', error);
+        // Continue with default company info
       } finally {
         setLoadingCompany(false);
       }

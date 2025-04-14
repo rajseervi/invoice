@@ -12,15 +12,61 @@ export async function GET() {
     
     // If no company info exists, initialize with defaults
     if (!companyInfo) {
-      companyInfo = await initializeDefaultCompanyInfo();
+      try {
+        companyInfo = await initializeDefaultCompanyInfo();
+      } catch (initError) {
+        console.error('Error initializing default company info:', initError);
+        // Return a default company info object if initialization fails
+        companyInfo = {
+          name: 'MasterStock Inc.',
+          shortName: 'MS',
+          tagline: 'Enterprise Inventory Management Solutions',
+          plan: {
+            name: 'Enterprise Plan',
+            expiryDate: new Date(new Date().getFullYear() + 1, 11, 31),
+            maxUsers: 15,
+            currentUsers: 12,
+            isActive: true
+          }
+        };
+      }
     }
     
-    return NextResponse.json({ success: true, data: companyInfo });
+    return NextResponse.json({ 
+      success: true, 
+      data: companyInfo 
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, max-age=0'
+      }
+    });
   } catch (error) {
     console.error('Error in GET /api/company:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch company information' },
-      { status: 500 }
+      { 
+        success: false, 
+        error: 'Failed to fetch company information',
+        fallbackData: {
+          name: 'MasterStock Inc.',
+          shortName: 'MS',
+          tagline: 'Enterprise Inventory Management Solutions',
+          plan: {
+            name: 'Enterprise Plan',
+            expiryDate: new Date(new Date().getFullYear() + 1, 11, 31),
+            maxUsers: 15,
+            currentUsers: 12,
+            isActive: true
+          }
+        }
+      },
+      { 
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, max-age=0'
+        }
+      }
     );
   }
 }
@@ -36,7 +82,13 @@ export async function POST(request: NextRequest) {
     if (!data.name || !data.plan) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
-        { status: 400 }
+        { 
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store, max-age=0'
+          }
+        }
       );
     }
     
@@ -47,12 +99,29 @@ export async function POST(request: NextRequest) {
       success: true, 
       data: savedCompanyInfo,
       message: 'Company information saved successfully'
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, max-age=0'
+      }
     });
   } catch (error) {
     console.error('Error in POST /api/company:', error);
+    
+    // Return the original data if saving fails
     return NextResponse.json(
-      { success: false, error: 'Failed to save company information' },
-      { status: 500 }
+      { 
+        success: false, 
+        error: 'Failed to save company information',
+        originalData: data // Return the original data so client can recover
+      },
+      { 
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, max-age=0'
+        }
+      }
     );
   }
 }
