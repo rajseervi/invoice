@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, CircularProgress, Box, Snackbar, Alert } from '@mui/material';
 import { useRouter } from 'next/navigation'; 
-import DashboardLayout from '@/app/components/Layout/Layout';
+import DashboardLayout from '@/components/DashboardLayout'; 
 import ProductForm from '@/components/ProductForm';
 import ConfirmationDialog from '@/components/ConfirmationDialog';
 import { productService } from '@/services/productService';

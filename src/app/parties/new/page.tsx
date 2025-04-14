@@ -2,7 +2,7 @@
 import React from 'react';
 import { Container, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import DashboardLayout from '@/app/components/Layout/Layout';
+import DashboardLayout from '@/components/DashboardLayout'; 
 import PartyForm from '@/components/PartyForm';
 import { partyService } from '@/services/partyService';
 import type { PartyFormData } from '@/types/party';

@@ -117,6 +117,18 @@ export default function Dashboard() {
   
   const [recentInvoices, setRecentInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
+  const [companyInfo, setCompanyInfo] = useState<any>({
+    name: 'MasterStock Inc.',
+    shortName: 'MS',
+    tagline: 'Enterprise Inventory Management Solutions',
+    plan: {
+      name: 'Enterprise Plan',
+      expiryDate: 'Dec 31, 2024',
+      maxUsers: 15,
+      currentUsers: 12,
+      isActive: true
+    }
+  });
   
   const salesData: SalesDataItem[] = [
     { name: 'Jan', amount: 4000 },
@@ -153,6 +165,20 @@ export default function Dashboard() {
           setError('Authentication service unavailable');
           setLoading(false);
           return;
+        }
+        
+        // Fetch company information
+        try {
+          const companyResponse = await fetch('/api/company');
+          if (companyResponse.ok) {
+            const companyData = await companyResponse.json();
+            if (companyData.success && companyData.data) {
+              setCompanyInfo(companyData.data);
+            }
+          }
+        } catch (companyErr) {
+          console.error('Error fetching company information:', companyErr);
+          // Continue with other data fetching even if company info fails
         }
         
         // Fetch invoices count and recent invoices
@@ -240,6 +266,138 @@ export default function Dashboard() {
         p: { xs: 2, sm: 3 },
         overflow: 'hidden'
       }}>
+        {/* Company Information Card */}
+        <Card 
+          elevation={0}
+          sx={{ 
+            mb: 4, 
+            borderRadius: 3,
+            border: `1px solid ${theme.palette.divider}`,
+            background: theme.palette.mode === 'light' 
+              ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(theme.palette.primary.main, 0.1)} 100%)`
+              : `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.2)} 0%, ${alpha(theme.palette.primary.main, 0.1)} 100%)`,
+            overflow: 'hidden'
+          }}
+        >
+          <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+            <Grid container spacing={3} alignItems="center">
+              <Grid item xs={12} md={6}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Box 
+                    sx={{ 
+                      width: { xs: 60, sm: 80 }, 
+                      height: { xs: 60, sm: 80 }, 
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 2,
+                      background: 'linear-gradient(135deg, rgba(67,97,238,0.2) 0%, rgba(72,149,239,0.2) 100%)',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+                    }}
+                  >
+                    <Typography 
+                      variant="h3" 
+                      sx={{ 
+                        fontWeight: 700, 
+                        color: theme.palette.primary.main,
+                        textShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                      }}
+                    >
+                      {companyInfo.shortName || 'MS'}
+                    </Typography>
+                  </Box>
+                  
+                  <Box>
+                    <Typography variant="h5" fontWeight={700} gutterBottom>
+                      {companyInfo.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      {companyInfo.tagline}
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                      <Chip 
+                        label={companyInfo.plan.name} 
+                        size="small" 
+                        color="primary" 
+                        sx={{ borderRadius: '4px' }}
+                      />
+                      <Chip 
+                        label={companyInfo.plan.isActive ? "Active License" : "Inactive License"} 
+                        size="small" 
+                        color={companyInfo.plan.isActive ? "success" : "error"} 
+                        variant="outlined"
+                        sx={{ borderRadius: '4px' }}
+                      />
+                      <Chip 
+                        label="Edit Company Info" 
+                        size="small" 
+                        color="default" 
+                        variant="outlined"
+                        component={Link}
+                        href="/settings/company"
+                        clickable
+                        sx={{ 
+                          borderRadius: '4px',
+                          mt: { xs: 1, sm: 0 },
+                          cursor: 'pointer'
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+              </Grid>
+              
+              <Grid item xs={12} md={6}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  flexWrap: 'wrap', 
+                  gap: 2,
+                  justifyContent: { xs: 'flex-start', md: 'flex-end' }
+                }}>
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    bgcolor: alpha(theme.palette.background.paper, 0.7),
+                    backdropFilter: 'blur(8px)',
+                    border: `1px solid ${theme.palette.divider}`,
+                    minWidth: { xs: '45%', sm: 'auto' }
+                  }}>
+                    <Typography variant="overline" color="text.secondary">
+                      License Valid Until
+                    </Typography>
+                    <Typography variant="h6" fontWeight={600}>
+                      {typeof companyInfo.plan.expiryDate === 'string' 
+                        ? companyInfo.plan.expiryDate 
+                        : new Date(companyInfo.plan.expiryDate).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })
+                      }
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    bgcolor: alpha(theme.palette.background.paper, 0.7),
+                    backdropFilter: 'blur(8px)',
+                    border: `1px solid ${theme.palette.divider}`,
+                    minWidth: { xs: '45%', sm: 'auto' }
+                  }}>
+                    <Typography variant="overline" color="text.secondary">
+                      Users
+                    </Typography>
+                    <Typography variant="h6" fontWeight={600}>
+                      {companyInfo.plan.currentUsers} / {companyInfo.plan.maxUsers}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
+
         {/* Dashboard Header */}
         <Box sx={{ 
           display: 'flex', 

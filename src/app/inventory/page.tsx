@@ -21,7 +21,8 @@ import {
   IconButton,
   Chip,
   LinearProgress,
-  useTheme
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import {
   PieChart,
@@ -63,6 +64,7 @@ interface CategoryData {
 
 export default function InventoryPage() {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -234,62 +236,65 @@ export default function InventoryPage() {
         ) : (
           <>
             {/* Summary Cards */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid item xs={12} md={3}>
+            <Grid container spacing={{ xs: 2, md: 3 }} sx={{ mb: { xs: 3, md: 4 } }}>
+              <Grid item xs={6} sm={6} md={3}>
                 <Card>
-                  <CardContent>
+                  <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                      <InventoryIcon color="primary" sx={{ mr: 1 }} />
-                      <Typography variant="h6" color="text.secondary">
+                      <InventoryIcon color="primary" sx={{ mr: 1, fontSize: { xs: '1.2rem', sm: '1.5rem' } }} />
+                      <Typography variant="subtitle1" color="text.secondary" noWrap sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
                         Total Products
                       </Typography>
                     </Box>
-                    <Typography variant="h3">
+                    <Typography variant="h4" sx={{ fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' } }}>
                       {products.length}
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={12} md={3}>
+              <Grid item xs={6} sm={6} md={3}>
                 <Card>
-                  <CardContent>
+                  <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                      <TrendingUpIcon color="success" sx={{ mr: 1 }} />
-                      <Typography variant="h6" color="text.secondary">
+                      <TrendingUpIcon color="success" sx={{ mr: 1, fontSize: { xs: '1.2rem', sm: '1.5rem' } }} />
+                      <Typography variant="subtitle1" color="text.secondary" noWrap sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
                         Inventory Value
                       </Typography>
                     </Box>
-                    <Typography variant="h3">
-                      ${totalValue.toFixed(2)}
+                    <Typography variant="h4" sx={{ fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' } }}>
+                      ${Number(totalValue).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })}
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={12} md={3}>
+              <Grid item xs={6} sm={6} md={3}>
                 <Card>
-                  <CardContent>
+                  <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                      <TrendingDownIcon color="warning" sx={{ mr: 1 }} />
-                      <Typography variant="h6" color="text.secondary">
-                        Low Stock Items
+                      <TrendingDownIcon color="warning" sx={{ mr: 1, fontSize: { xs: '1.2rem', sm: '1.5rem' } }} />
+                      <Typography variant="subtitle1" color="text.secondary" noWrap sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                        Low Stock
                       </Typography>
                     </Box>
-                    <Typography variant="h3" color="warning.main">
+                    <Typography variant="h4" color="warning.main" sx={{ fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' } }}>
                       {lowStockProducts.length}
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={12} md={3}>
+              <Grid item xs={6} sm={6} md={3}>
                 <Card>
-                  <CardContent>
+                  <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                      <WarningIcon color="error" sx={{ mr: 1 }} />
-                      <Typography variant="h6" color="text.secondary">
+                      <WarningIcon color="error" sx={{ mr: 1, fontSize: { xs: '1.2rem', sm: '1.5rem' } }} />
+                      <Typography variant="subtitle1" color="text.secondary" noWrap sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
                         Categories
                       </Typography>
                     </Box>
-                    <Typography variant="h3">
+                    <Typography variant="h4" sx={{ fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' } }}>
                       {categoryData.length}
                     </Typography>
                   </CardContent>
@@ -298,14 +303,14 @@ export default function InventoryPage() {
             </Grid>
             
             {/* Main Content */}
-            <Grid container spacing={3}>
+            <Grid container spacing={{ xs: 2, md: 3 }}>
               {/* Left Column - Pie Chart */}
               <Grid item xs={12} md={6}>
-                <Paper sx={{ p: 3, height: '100%' }}>
-                  <Typography variant="h5" gutterBottom>
+                <Paper sx={{ p: { xs: 2, sm: 3 }, height: '100%' }}>
+                  <Typography variant="h5" gutterBottom sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.5rem' } }}>
                     Inventory Value by Category
                   </Typography>
-                  <Box sx={{ height: 300, mt: 2 }}>
+                  <Box sx={{ height: { xs: 250, sm: 300 }, mt: 2 }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
@@ -314,16 +319,17 @@ export default function InventoryPage() {
                           nameKey="name"
                           cx="50%"
                           cy="50%"
-                          outerRadius={100}
+                          outerRadius={isMobile ? 80 : 100}
                           fill="#8884d8"
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          label={isMobile ? undefined : ({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          labelLine={!isMobile}
                         >
                           {categoryData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
                         <Tooltip content={<CustomTooltip />} />
-                        <Legend />
+                        <Legend layout={isMobile ? "horizontal" : "vertical"} verticalAlign={isMobile ? "bottom" : "middle"} align={isMobile ? "center" : "right"} />
                       </PieChart>
                     </ResponsiveContainer>
                   </Box>
@@ -332,12 +338,12 @@ export default function InventoryPage() {
               
               {/* Right Column - Stock Status */}
               <Grid item xs={12} md={6}>
-                <Paper sx={{ p: 3, height: '100%' }}>
-                  <Typography variant="h5" gutterBottom>
+                <Paper sx={{ p: { xs: 2, sm: 3 }, height: '100%' }}>
+                  <Typography variant="h5" gutterBottom sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.5rem' } }}>
                     Stock Status
                   </Typography>
                   
-                  <Box sx={{ mt: 3 }}>
+                  <Box sx={{ mt: { xs: 2, sm: 3 } }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                       <Typography variant="body2">Normal Stock</Typography>
                       <Typography variant="body2">{stockStatus.normal}%</Typography>
@@ -346,7 +352,7 @@ export default function InventoryPage() {
                       variant="determinate" 
                       value={stockStatus.normal} 
                       color="success"
-                      sx={{ height: 10, borderRadius: 5, mb: 2 }}
+                      sx={{ height: { xs: 8, sm: 10 }, borderRadius: 5, mb: 2 }}
                     />
                     
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
@@ -357,7 +363,7 @@ export default function InventoryPage() {
                       variant="determinate" 
                       value={stockStatus.low} 
                       color="warning"
-                      sx={{ height: 10, borderRadius: 5, mb: 2 }}
+                      sx={{ height: { xs: 8, sm: 10 }, borderRadius: 5, mb: 2 }}
                     />
                     
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
@@ -368,35 +374,44 @@ export default function InventoryPage() {
                       variant="determinate" 
                       value={stockStatus.critical} 
                       color="error"
-                      sx={{ height: 10, borderRadius: 5, mb: 2 }}
+                      sx={{ height: { xs: 8, sm: 10 }, borderRadius: 5, mb: 2 }}
                     />
                   </Box>
                   
-                  <Divider sx={{ my: 3 }} />
+                  <Divider sx={{ my: { xs: 2, sm: 3 } }} />
                   
-                  <Typography variant="h6" gutterBottom>
+                  <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' } }}>
                     Critical Stock Items
                   </Typography>
                   
-                  <List>
-                    {lowStockProducts.slice(0, 5).map((product) => (
+                  <List dense={isMobile}>
+                    {lowStockProducts.slice(0, isMobile ? 3 : 5).map((product) => (
                       <ListItem key={product.id} divider>
                         <ListItemText
                           primary={product.name}
                           secondary={`Category: ${product.category}`}
+                          primaryTypographyProps={{ 
+                            noWrap: true,
+                            fontSize: isMobile ? '0.875rem' : 'inherit'
+                          }}
+                          secondaryTypographyProps={{ 
+                            noWrap: true,
+                            fontSize: isMobile ? '0.75rem' : 'inherit'
+                          }}
                         />
                         <ListItemSecondaryAction>
                           <Chip 
                             label={`Stock: ${product.stock}`} 
                             color={product.stock <= CRITICAL_STOCK_THRESHOLD ? "error" : "warning"}
                             size="small"
+                            sx={{ fontSize: isMobile ? '0.7rem' : '0.75rem' }}
                           />
                         </ListItemSecondaryAction>
                       </ListItem>
                     ))}
                   </List>
                   
-                  {lowStockProducts.length > 5 && (
+                  {lowStockProducts.length > (isMobile ? 3 : 5) && (
                     <Box sx={{ mt: 2, textAlign: 'center' }}>
                       <Button 
                         variant="outlined" 
@@ -413,41 +428,49 @@ export default function InventoryPage() {
               
               {/* Bottom Section - Category Details */}
               <Grid item xs={12}>
-                <Paper sx={{ p: 3, mt: 3 }}>
-                  <Typography variant="h5" gutterBottom>
+                <Paper sx={{ p: { xs: 2, sm: 3 }, mt: { xs: 2, sm: 3 } }}>
+                  <Typography variant="h5" gutterBottom sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.5rem' } }}>
                     Category Details
                   </Typography>
-                  <Grid container spacing={2} sx={{ mt: 1 }}>
-                    {categoryData.slice(0, 6).map((category, index) => (
+                  <Grid container spacing={{ xs: 1.5, sm: 2 }} sx={{ mt: 0.5 }}>
+                    {categoryData.slice(0, isMobile ? 3 : 6).map((category, index) => (
                       <Grid item xs={12} sm={6} md={4} key={category.name}>
                         <Card variant="outlined">
                           <CardHeader 
                             title={category.name} 
-                            titleTypographyProps={{ variant: 'h6' }}
+                            titleTypographyProps={{ 
+                              variant: 'h6',
+                              fontSize: { xs: '0.95rem', sm: '1.1rem' },
+                              noWrap: true
+                            }}
                             avatar={
                               <Box 
                                 sx={{ 
-                                  width: 16, 
-                                  height: 16, 
+                                  width: { xs: 12, sm: 16 }, 
+                                  height: { xs: 12, sm: 16 }, 
                                   borderRadius: '50%', 
                                   bgcolor: category.color 
                                 }} 
                               />
                             }
+                            sx={{ py: { xs: 1.5, sm: 2 }, px: { xs: 1.5, sm: 2 } }}
                           />
                           <Divider />
-                          <CardContent>
-                            <Typography variant="body2" color="text.secondary" gutterBottom>
-                              Value: ${category.value.toFixed(2)}
+                          <CardContent sx={{ py: { xs: 1.5, sm: 2 }, px: { xs: 1.5, sm: 2 } }}>
+                            <Typography variant="body2" color="text.secondary" gutterBottom sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+                              Value: ${Number(category.value).toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                              })}
                             </Typography>
-                            <Typography variant="body2" color="text.secondary" gutterBottom>
+                            <Typography variant="body2" color="text.secondary" gutterBottom sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                               {((category.value / totalValue) * 100).toFixed(1)}% of total inventory
                             </Typography>
                             <LinearProgress 
                               variant="determinate" 
                               value={(category.value / totalValue) * 100} 
                               sx={{ 
-                                height: 6, 
+                                height: { xs: 4, sm: 6 }, 
                                 borderRadius: 3,
                                 bgcolor: 'rgba(0,0,0,0.1)',
                                 '& .MuiLinearProgress-bar': {
@@ -461,12 +484,13 @@ export default function InventoryPage() {
                     ))}
                   </Grid>
                   
-                  {categoryData.length > 6 && (
-                    <Box sx={{ mt: 3, textAlign: 'center' }}>
+                  {categoryData.length > (isMobile ? 3 : 6) && (
+                    <Box sx={{ mt: { xs: 2, sm: 3 }, textAlign: 'center' }}>
                       <Button 
                         variant="outlined"
                         href="/products"
                         endIcon={<ArrowForwardIcon />}
+                        size={isMobile ? "small" : "medium"}
                       >
                         View All Categories
                       </Button>

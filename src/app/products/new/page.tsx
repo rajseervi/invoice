@@ -2,7 +2,7 @@
 import React from 'react';
 import { Container, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import DashboardLayout from '@/app/components/Layout/Layout';
+import DashboardLayout from '@/components/DashboardLayout';  
  
 import ProductForm from '@/components/ProductForm';
 import { productService } from '@/services/productService';
